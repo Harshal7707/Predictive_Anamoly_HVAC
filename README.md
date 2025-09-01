@@ -1,4 +1,4 @@
-﻿# Predictive_Anamoly_HVAC
+﻿
 
 # Predictive Anomaly HVAC
 
@@ -69,4 +69,5 @@ Add screenshots of your app here, for example:
 ├── requirements.txt
 ├── README.md
 └── images/ # screenshots
+
 
