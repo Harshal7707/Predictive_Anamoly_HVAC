@@ -1,5 +1,3 @@
-# streamlit_hvac_interactive_app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -15,17 +13,17 @@ Upload your HVAC CSV dataset.
 Use the dropdowns to select which column to plot over time, and inspect anomalies in T_Supply.
 """)
 
-# File uploader
+
 uploaded_file = st.file_uploader("Upload HVAC CSV file", type="csv")
 if uploaded_file is None:
     st.stop()
 
-# Load data
+
 df = pd.read_csv(uploaded_file, parse_dates=["Timestamp"])
 st.write("### Dataset Preview")
 st.dataframe(df.head(10), use_container_width=True)
 
-# Ensure required columns
+
 required = ["Timestamp","T_Supply","T_Return","SP_Return","T_Saturation",
             "T_Outdoor","RH_Supply","RH_Return","RH_Outdoor","Energy","Power"]
 missing = [c for c in required if c not in df.columns]
@@ -33,7 +31,7 @@ if missing:
     st.error(f"Missing columns: {missing}")
     st.stop()
 
-# Anomaly detection on T_Supply
+
 data = df["T_Supply"].values
 z_scores = np.abs(stats.zscore(data))
 mz = 0.6745 * np.abs(data - np.median(data)) / np.median(np.abs(data - np.median(data)))
@@ -51,10 +49,9 @@ methods = {
 }
 consensus = set.intersection(*[set(v) for v in methods.values()])
 
-# Column selection dropdown
 col = st.selectbox("Select Column to Plot", df.columns.drop("Timestamp"))
   
-# Time-series plot
+
 st.write(f"### Time Series of {col}")
 fig, ax = plt.subplots(figsize=(10,4))
 ax.plot(df["Timestamp"], df[col], marker=".", linestyle="-")
@@ -67,13 +64,11 @@ ax.set_ylabel(col)
 ax.legend()
 st.pyplot(fig)
 
-# Show anomaly detection summary for T_Supply
 st.write("### T_Supply Anomaly Detection Summary")
 for name, idx in methods.items():
     st.write(f"- **{name}** flagged rows: {idx.tolist()}")
 st.write(f"**Consensus anomalies**: {sorted(consensus)}")
 
-# Download processed file with anomaly flag
 df["Anomaly"] = False
 df.loc[list(consensus),"Anomaly"] = True
 csv = df.to_csv(index=False).encode()
